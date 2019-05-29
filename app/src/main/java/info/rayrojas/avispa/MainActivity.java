@@ -1,5 +1,8 @@
 package info.rayrojas.avispa;
 
+import android.app.ActivityManager;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -18,10 +21,12 @@ import android.view.Menu;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.InstanceIdResult;
+import com.pusher.client.Pusher;
+import com.pusher.client.PusherOptions;
+import com.pusher.client.channel.Channel;
+import com.pusher.client.channel.SubscriptionEventListener;
+
+import info.rayrojas.avispa.services.SpyService;
 
 
 public class MainActivity extends AppCompatActivity
@@ -52,27 +57,42 @@ public class MainActivity extends AppCompatActivity
 
         editText = (EditText) findViewById(R.id.editText);
 
-        FirebaseInstanceId.getInstance().getInstanceId()
-                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                        if (!task.isSuccessful()) {
-//To do//
-                            return;
-                        }
-                        // Get new Instance ID token
-                        String token = task.getResult().getToken();
-                        editText.setText(token);
-                        // Log and toast
-                        String msg = getString(R.string.msg_token_fmt, token);
-                        Log.d("PLAGA>", msg);
-                        Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
 
-                    }
-                });
+        doStartService();
+
+
 
     }
 
+    public void doStartService() {
+        SpyService serviceObject = new SpyService(getApplicationContext());
+        Intent mServiceIntent = new Intent(getApplicationContext(), serviceObject.getClass());
+        if (!isMyServiceRunning(serviceObject.getClass())) {
+            startService(mServiceIntent);
+        }
+//        startService(new Intent(this, SpyService.class));
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                Log.v ("bichito", true+"<<");
+                return true;
+            }
+        }
+        Log.v("bichito", false+">>");
+        return false;
+    }
+
+    public void doStopService() {
+        stopService(new Intent(this, SpyService.class));
+    }
+
+    public void doAfterMessage(String channelName, String eventName, final String data) {
+        Log.v("bichito", data);
+        editText.setText(data);
+    }
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -128,5 +148,26 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.v("bichito", "gonna pause");
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.v("bichito", "gonna stop");
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.v("bichito", "gonna close");
+
     }
 }
