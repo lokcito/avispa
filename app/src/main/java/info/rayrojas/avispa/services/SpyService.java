@@ -6,9 +6,11 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -18,6 +20,10 @@ import com.pusher.client.channel.Channel;
 import com.pusher.client.channel.SubscriptionEventListener;
 
 import info.rayrojas.avispa.MainActivity;
+import info.rayrojas.avispa.R;
+import info.rayrojas.avispa.notifiers.NotificationView;
+
+import static android.support.v4.app.NotificationCompat.VISIBILITY_PUBLIC;
 
 public class SpyService extends Service {
     private static final int NOTIFICATION_ID = 1;
@@ -32,28 +38,63 @@ public class SpyService extends Service {
         Log.v("bichito", "aqui sse crea el servicio");
     }
 
-    private void showForegroundNotification(String contentText) {
-        // Create intent that will bring our app to the front, as if it was tapped in the app
-        // launcher
-        Intent showTaskIntent = new Intent(getApplicationContext(), MainActivity.class);
-        showTaskIntent.setAction(Intent.ACTION_MAIN);
-        showTaskIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-        showTaskIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    public void Notification() {
+        // Set Notification Title
+        String strtitle = "sss";
+        // Set Notification Text
+        String strtext = "sds";
 
-        PendingIntent contentIntent = PendingIntent.getActivity(
-                getApplicationContext(),
-                0,
-                showTaskIntent,
+        // Open NotificationView Class on Notification Click
+        Intent intent = new Intent(this, NotificationView.class);
+        // Send data to NotificationView Class
+        intent.putExtra("title", strtitle);
+        intent.putExtra("text", strtext);
+        // Open NotificationView.java Activity
+        PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Notification notification = new Notification.Builder(getApplicationContext())
-                .setContentTitle("xxcxc")
-                .setContentText(contentText)
-//                .setSmallIcon(R.drawable.ic_notification)
-                .setWhen(System.currentTimeMillis())
+        //Create Notification using NotificationCompat.Builder
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                // Set Icon
+                .setSmallIcon(R.drawable.ic_menu_manage)
+                // Set Ticker Message
+                .setTicker(getString(R.string.notificationticker))
+                // Set Title
+                .setContentTitle(getString(R.string.notificationtitle))
+                // Set Text
+                .setContentText(getString(R.string.notificationtext))
+                // Add an Action Button below Notification
+                .addAction(R.drawable.ic_menu_camera, "Action Button", pIntent)
+                // Set PendingIntent into Notification
+                .setContentIntent(pIntent)
+                // Dismiss Notification
+                .setAutoCancel(true);
+
+        // Create Notification Manager
+        NotificationManager notificationmanager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        // Build Notification with Notification Manager
+        notificationmanager.notify(0, builder.build());
+
+    }
+
+    private void showForegroundNotification(String contentText) {
+        Intent notificationIntent = new Intent(Intent.ACTION_VIEW);
+        notificationIntent.setData(Uri.parse("http://www.wgn.com"));
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+
+        Notification notification = new NotificationCompat.Builder(this)
+                .setCategory(Notification.CATEGORY_PROMO)
+                .setContentTitle("aaaa")
+                .setContentText("ssss")
+                .setAutoCancel(true)
+                .setVisibility(VISIBILITY_PUBLIC)
+                .addAction(android.R.drawable.ic_menu_view, "View details", contentIntent)
                 .setContentIntent(contentIntent)
-                .build();
-        startForeground(NOTIFICATION_ID, notification);
+                .setPriority(Notification.PRIORITY_HIGH)
+                .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000}).build();
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.notify(1, notification);
     }
     @Override
     public IBinder onBind(Intent intent) {
@@ -76,7 +117,9 @@ public class SpyService extends Service {
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(SpyService.this, data, Toast.LENGTH_SHORT).show();
+                        Notification();
+//                        showForegroundNotification("xxxxg");
+//                        Toast.makeText(SpyService.this, data, Toast.LENGTH_SHORT).show();
                     }
                 });
 
