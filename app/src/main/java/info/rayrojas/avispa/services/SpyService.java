@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Handler;
@@ -76,15 +77,15 @@ public class SpyService extends Service {
         //Create Notification using NotificationCompat.Builder
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 // Set Icon
-                .setSmallIcon(R.drawable.ic_menu_manage)
+                .setSmallIcon(R.drawable.ic_hongus)
                 // Set Ticker Message
-                .setTicker(getString(R.string.notificationticker))
+                .setTicker(getString(R.string.avispa_notify))
                 // Set Title
                 .setContentTitle(title)
                 // Set Text
                 .setContentText(message)
                 // Add an Action Button below Notification
-                .addAction(R.drawable.ic_menu_camera, "Action Button", pIntent)
+                .addAction(R.drawable.ic_hongus, "Action Button", pIntent)
                 // Set PendingIntent into Notification
                 .setContentIntent(pIntent)
                 // Dismiss Notification

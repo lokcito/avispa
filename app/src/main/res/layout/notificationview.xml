@@ -8,14 +8,14 @@
         android:id="@+id/lbltitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="zx" />
+         />
 
     <TextView
         android:id="@+id/lbltext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/lbltitle"
-        android:text="xxx" />
+         />
 
     <TextView
         android:id="@+id/title"

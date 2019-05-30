@@ -14,14 +14,7 @@
     <string name="menu_share">Share</string>
     <string name="menu_send">Send</string>
     <string name="msg_token_fmt">Bichitos FCM Token: %s</string>
-    <string name="notificationtitle">Android Notification Tutorial</string>
-    <string name="notificationtext">Notification Text</string>
-    <string name="notificationticker">Notification Ticker</string>
-    <string name="customnotificationtitle">Android Notification Tutorial</string>
-    <string name="customnotificationtext">Custom Notification Text</string>
-    <string name="customnotificationticker">Custom Notification Ticker</string>
+    <string name="avispa_notify">Avispa is talking</string>
     <string name="lbltitle">"Title : "</string>
     <string name="lbltext">"Text : "</string>
-    <string name="notification">Notification</string>
-    <string name="customnotification">Custom Notification</string>
 </resources>
