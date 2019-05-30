@@ -1,9 +1,12 @@
 package info.rayrojas.avispa;
 
 import android.app.ActivityManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -19,6 +22,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.pusher.client.Pusher;
@@ -26,13 +30,24 @@ import com.pusher.client.PusherOptions;
 import com.pusher.client.channel.Channel;
 import com.pusher.client.channel.SubscriptionEventListener;
 
+import java.util.ArrayList;
+
+import info.rayrojas.avispa.adapters.NotifyAdapter;
+import info.rayrojas.avispa.models.Notify;
 import info.rayrojas.avispa.services.SpyService;
 
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        ServiceConnection, SpyService.CallBack {
 
     EditText editText;
+    ListView listViewNotifications;
+    ArrayList<Notify> items;
+    NotifyAdapter itemsAdapter;
+    SpyService serviceCommunitcation;
+
+    Notify list;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,21 +70,37 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
 
-        editText = (EditText) findViewById(R.id.editText);
 
 
-        doStartService();
+        list = new Notify();
+//        Log.v("bichito", list.getAll(this).size() + "<<items");
+//
+//        Notify currentUser = new Notify();
+//        currentUser.id = 1;
+//        currentUser.title = "sample";
+//        currentUser.message = "sample message";
+//        currentUser.extra = "sample extra";
+//        currentUser.token = "0";
+//        currentUser.setLocal(this);
 
+        listViewNotifications = (ListView) findViewById(R.id.listNotifications);
 
+        items = list.getAll(this);
+
+        itemsAdapter =
+                new NotifyAdapter(this, items);
+
+        listViewNotifications.setAdapter(itemsAdapter);
 
     }
 
     public void doStartService() {
-        SpyService serviceObject = new SpyService(getApplicationContext());
-        Intent mServiceIntent = new Intent(getApplicationContext(), serviceObject.getClass());
-        if (!isMyServiceRunning(serviceObject.getClass())) {
+        //SpyService serviceObject = new SpyService(getApplicationContext());
+        Intent mServiceIntent = new Intent(this, SpyService.class);
+        if (!isMyServiceRunning(SpyService.class)) {
             startService(mServiceIntent);
         }
+        bindService(mServiceIntent, this, Context.BIND_AUTO_CREATE);
 //        startService(new Intent(this, SpyService.class));
     }
 
@@ -134,7 +165,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_home) {
             // Handle the camera action
         } else if (id == R.id.nav_gallery) {
-
+            updateRows();
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_tools) {
@@ -150,10 +181,23 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    public void updateRows() {
+        items.clear();
+        items.addAll(list.getAll(this));
+        Toast.makeText(this, "n rows: " + items.size(), Toast.LENGTH_SHORT).show();
+        itemsAdapter.notifyDataSetChanged();
+
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
         Log.v("bichito", "gonna pause");
+// unbindService if activity is in onPause() state
+        if (serviceCommunitcation != null) {
+            serviceCommunitcation.setCallBack(null);
+            unbindService(this);
+        }
 
     }
 
@@ -169,5 +213,42 @@ public class MainActivity extends AppCompatActivity
         super.onDestroy();
         Log.v("bichito", "gonna close");
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        doStartService();
+    }
+
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service) {
+        serviceCommunitcation = ((SpyService.MyBinder)service).getService();
+        serviceCommunitcation.setCallBack(this);
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName name) {
+
+    }
+
+    @Override
+    public void onBindingDied(ComponentName name) {
+
+    }
+
+    @Override
+    public void onNullBinding(ComponentName name) {
+
+    }
+
+    @Override
+    public void onOperationProgress(int progress) {
+
+    }
+
+    @Override
+    public void onOperationCompleted() {
+        updateRows();
     }
 }

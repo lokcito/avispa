@@ -7,6 +7,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -19,8 +20,12 @@ import com.pusher.client.PusherOptions;
 import com.pusher.client.channel.Channel;
 import com.pusher.client.channel.SubscriptionEventListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import info.rayrojas.avispa.MainActivity;
 import info.rayrojas.avispa.R;
+import info.rayrojas.avispa.models.Notify;
 import info.rayrojas.avispa.notifiers.NotificationView;
 
 import static android.support.v4.app.NotificationCompat.VISIBILITY_PUBLIC;
@@ -29,8 +34,22 @@ public class SpyService extends Service {
     private static final int NOTIFICATION_ID = 1;
     public int counter = 0;
     Context context;
+    private CallBack mCallBack;
+    private MyBinder mLocalbinder = new MyBinder();
     public SpyService() {
 
+    }
+    public interface CallBack {
+        void onOperationProgress(int progress);
+        void onOperationCompleted();
+    }
+    public class MyBinder extends Binder {
+        public SpyService getService() {
+            return SpyService.this;
+        }
+    }
+    public void setCallBack(CallBack callBack) {
+        mCallBack = callBack;
     }
     public SpyService(Context applicationContext) {
         super();
@@ -38,7 +57,7 @@ public class SpyService extends Service {
         Log.v("bichito", "aqui sse crea el servicio");
     }
 
-    public void Notification() {
+    public void Notification(String title, String message) {
         // Set Notification Title
         String strtitle = "sss";
         // Set Notification Text
@@ -60,9 +79,9 @@ public class SpyService extends Service {
                 // Set Ticker Message
                 .setTicker(getString(R.string.notificationticker))
                 // Set Title
-                .setContentTitle(getString(R.string.notificationtitle))
+                .setContentTitle(title)
                 // Set Text
-                .setContentText(getString(R.string.notificationtext))
+                .setContentText(message)
                 // Add an Action Button below Notification
                 .addAction(R.drawable.ic_menu_camera, "Action Button", pIntent)
                 // Set PendingIntent into Notification
@@ -98,7 +117,7 @@ public class SpyService extends Service {
     }
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return mLocalbinder;
     }
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId) {
@@ -112,12 +131,54 @@ public class SpyService extends Service {
         channel.bind("my-event", new SubscriptionEventListener() {
             @Override
             public void onEvent(final String channelName, final String eventName, final String data) {
+                JSONObject jsonObject = null;
+                try {
+                    jsonObject = new JSONObject(data);
+                }catch (JSONException err){
+                    Log.d("Error", err.toString());
+                    return;
+                }
+                if ( jsonObject == null ) {
+                    return;
+                }
+                String _title = "Pusher Notification";
+                String _message = data;
+                String _extra = "-";
+                try {
+                    _title = jsonObject.getString("title");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    _message = jsonObject.getString("message");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    _extra = jsonObject.getString("_extra");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                final String title = _title;
+                final String message = _message;
+                final String extra = _extra;
                 //editText.setText(data);
 //                showForegroundNotification(data);
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
-                        Notification();
+                    Notify currentUser = new Notify();
+                    currentUser.setId(0);
+                    currentUser.setTitle(title);
+                    currentUser.setMessage(message);
+                    currentUser.setExtra(extra);
+                    currentUser.setToken("0");
+                    currentUser.setLocal(SpyService.this);
+                    Notification(title, message);
+                    if (mCallBack != null) {
+                        mCallBack.onOperationCompleted();
+                    }
+
 //                        showForegroundNotification("xxxxg");
 //                        Toast.makeText(SpyService.this, data, Toast.LENGTH_SHORT).show();
                     }
