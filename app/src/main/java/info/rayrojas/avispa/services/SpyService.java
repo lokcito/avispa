@@ -25,6 +25,7 @@ import org.json.JSONObject;
 
 import info.rayrojas.avispa.MainActivity;
 import info.rayrojas.avispa.R;
+import info.rayrojas.avispa.conf.Settings;
 import info.rayrojas.avispa.models.Notify;
 import info.rayrojas.avispa.notifiers.NotificationView;
 
@@ -124,11 +125,11 @@ public class SpyService extends Service {
         super.onStartCommand(intent, flags, startId);
         PusherOptions options = new PusherOptions();
         options.setCluster("us2");
-        Pusher pusher = new Pusher("59478312f8e6af560ebc", options);
+        Pusher pusher = new Pusher(Settings.PUSHER_TOKEN, options);
 
-        Channel channel = pusher.subscribe("my-channel");
+        Channel channel = pusher.subscribe(Settings.PUSHER_CHANNEL_INFO);
 
-        channel.bind("my-event", new SubscriptionEventListener() {
+        channel.bind(Settings.PUSHER_EVENT_INFO, new SubscriptionEventListener() {
             @Override
             public void onEvent(final String channelName, final String eventName, final String data) {
                 JSONObject jsonObject = null;
