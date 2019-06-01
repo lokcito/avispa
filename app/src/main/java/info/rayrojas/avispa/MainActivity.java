@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Credentials;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
@@ -21,18 +22,24 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.pusher.client.Pusher;
-import com.pusher.client.PusherOptions;
-import com.pusher.client.channel.Channel;
-import com.pusher.client.channel.SubscriptionEventListener;
+import com.hudomju.swipe.OnItemClickListener;
+import com.hudomju.swipe.SwipeToDismissTouchListener;
+import com.hudomju.swipe.adapter.ListViewAdapter;
+
 
 import java.util.ArrayList;
 
+import info.rayrojas.avispa.activities.CredentialsActivity;
 import info.rayrojas.avispa.adapters.NotifyAdapter;
+import info.rayrojas.avispa.models.Channel;
+import info.rayrojas.avispa.models.Credential;
+import info.rayrojas.avispa.models.Event;
 import info.rayrojas.avispa.models.Notify;
 import info.rayrojas.avispa.services.SpyService;
 
@@ -72,6 +79,12 @@ public class MainActivity extends AppCompatActivity
 
 
 
+//        Event oo = new Event();
+//        oo.getAll(this);
+//        Credential o = new Credential();
+//        o.getAll(this);
+//        Channel ooo = new Channel();
+//        ooo.getAll(this);
         list = new Notify();
 //        Log.v("bichito", list.getAll(this).size() + "<<items");
 //
@@ -92,7 +105,45 @@ public class MainActivity extends AppCompatActivity
 
         listViewNotifications.setAdapter(itemsAdapter);
 
+        final SwipeToDismissTouchListener<ListViewAdapter> touchListener =
+                new SwipeToDismissTouchListener<>(
+                        new ListViewAdapter(listViewNotifications),
+                        new SwipeToDismissTouchListener.DismissCallbacks<ListViewAdapter>() {
+                            @Override
+                            public boolean canDismiss(int position) {
+                                return true;
+                            }
+
+                            @Override
+                            public void onDismiss(ListViewAdapter view, int position) {
+                                itemsAdapter.remove(position);
+                                updateRows();
+                            }
+                        });
+
+        listViewNotifications.setOnTouchListener(touchListener);
+        listViewNotifications.setOnScrollListener((AbsListView.OnScrollListener) touchListener.makeScrollListener());
+        listViewNotifications.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (touchListener.existPendingDismisses()) {
+                    touchListener.undoPendingDismiss();
+                } else {
+                    Toast.makeText(MainActivity.this, "Position " + position, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
     }
+
+    //            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                if (touchListener.existPendingDismisses()) {
+//                    touchListener.undoPendingDismiss();
+//                } else {
+//                    Toast.makeText(MainActivity.this, "Position " + position, Toast.LENGTH_SHORT).show();
+//                }
+//            }
 
     public void doStartService() {
         //SpyService serviceObject = new SpyService(getApplicationContext());
@@ -167,7 +218,8 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_gallery) {
             updateRows();
         } else if (id == R.id.nav_slideshow) {
-
+            Intent o = new Intent(this, CredentialsActivity.class);
+            startActivity(o);
         } else if (id == R.id.nav_tools) {
 
         } else if (id == R.id.nav_share) {

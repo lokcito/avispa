@@ -17,4 +17,8 @@
     <string name="avispa_notify">Avispa is talking</string>
     <string name="lbltitle">"Title : "</string>
     <string name="lbltext">"Text : "</string>
+    <string name="title_activity_credentials">CredentialsActivity</string>
+    <string name="tab_text_1">Tokens</string>
+    <string name="tab_text_2">Eventos</string>
+    <string name="tab_text_3">Canales</string>
 </resources>

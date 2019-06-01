@@ -16,8 +16,8 @@ public class Notify {
     private String title;
     private String message;
     private String token;
-    private String extra;
     public static NotifyDbHelper dbInstance;
+    private String extra;
 
     public int getId() {
         return id;
@@ -64,10 +64,7 @@ public class Notify {
 
     public static class NotifyTable implements BaseColumns {
         public static final String TABLE_NAME = "avispa_notifications";
-        public static final String COLUMN_NAME_TITLE = "title";
-        public static final String COLUMN_NAME_TOKEN = "token";
-        public static final String COLUMN_NAME_MESSAGE = "message";
-        public static final String COLUMN_NAME_EXTRA = "extra";
+
     }
 
     public class NotifyDbHelper extends SQLiteOpenHelper {
@@ -161,30 +158,16 @@ public class Notify {
         return rows;
     }
 
-//    public void syncLocal(Context _context) {
-//        SQLiteDatabase db = this.getDbInstance(_context).getReadableDatabase();
-//
-//        String[] fields = new String[] {UserTable.COLUMN_NAME_FIRST_NAME};
-//        String[] args = new String[] {this.id + ""};
-//
-//        this.localSynced = false;
-//
-//        Cursor c = db.query(UserTable.TABLE_NAME, fields, "_id=?", args,  null, null, null);
-//
-//        //Nos aseguramos de que existe al menos un registro
-//        if (c.moveToFirst()) {
-//            do {
-//                this.first_name = c.getString(0);
-//                this.localSynced = true;
-//            } while(c.moveToNext());
-//        }
-//    }
+    public void unsetLocal(Context _context) {
+        SQLiteDatabase db = this.getDbInstance(_context).getWritableDatabase();
+        String[] args = new String[] {this.getId() + ""};
+        db.delete(NotifyTable.TABLE_NAME, "_id = ?", args);
+    }
 
     public void setLocal(Context _context) {
         SQLiteDatabase db = this.getDbInstance(_context).getWritableDatabase();
 
         ContentValues values = new ContentValues();
-//        values.put(NotifyTable._ID, this.id);
         values.put(NotifyTable.COLUMN_NAME_TITLE, this.getTitle());
         values.put(NotifyTable.COLUMN_NAME_MESSAGE, this.getMessage());
         values.put(NotifyTable.COLUMN_NAME_EXTRA, this.getExtra());
@@ -192,17 +175,10 @@ public class Notify {
 
         String[] args = new String[] {this.getId() + ""};
 
-        //this.syncLocal(_context);
-
-////        if ( this.localSynced ) {//
-//            db.update(NotifyTable.TABLE_NAME, values, "_id = ?", args);
-////        } else {
         if (this.id == 0) {
             this.id = this.getAll(_context).size() + 1;
         }
         long newRowId = db.insert(NotifyTable.TABLE_NAME, null, values);
-//        }
-
     }
 
 

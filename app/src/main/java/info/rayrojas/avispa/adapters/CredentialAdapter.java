@@ -1,71 +1,62 @@
 package info.rayrojas.avispa.adapters;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.ArrayAdapter;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import info.rayrojas.avispa.R;
+import info.rayrojas.avispa.models.Credential;
 import info.rayrojas.avispa.models.Notify;
 
-public class NotifyAdapter extends ArrayAdapter<Notify> {
+public class CredentialAdapter extends ArrayAdapter<Credential> {
     Context context;
-    ArrayList<Notify> items;
+    ArrayList<Credential> items;
 
     private class ViewHolder {
         TextView id;
-        TextView title;
-        TextView message;
-        TextView extra;
-        Button more;
+        TextView token;
 
         private ViewHolder() {
         }
     }
 
     public void remove(int position) {
-        Notify o = this.items.get(position);
+        Credential o = this.items.get(position);
         if ( o != null ) {
             o.unsetLocal(this.context);
         }
     }
 
-    public NotifyAdapter(Context context, ArrayList<Notify> _items) {
+    public CredentialAdapter(Context context, ArrayList<Credential> _items) {
         super(context, 0, _items);
         this.items = _items;
         this.context = context;
     }
 
     public View getView(final int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
-        final Notify rowItem = (Notify) getItem(position);
+        CredentialAdapter.ViewHolder holder;
+        final Credential rowItem = (Credential) getItem(position);
         LayoutInflater mInflater = (LayoutInflater) this.context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
         if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.adapter_notify_item, null);
-            holder = new ViewHolder();
+            convertView = mInflater.inflate(R.layout.adapter_credential_item, null);
+            holder = new CredentialAdapter.ViewHolder();
 
-            holder.id = (TextView) convertView.findViewById(R.id._id);
-            holder.title = (TextView) convertView.findViewById(R.id.title);
-            holder.message = (TextView) convertView.findViewById(R.id.message);
-            holder.extra = (TextView) convertView.findViewById(R.id.extra);
+            //holder.id = (TextView) convertView.findViewById(R.id._id);
+            holder.token = (TextView) convertView.findViewById(R.id.token);
 //            holder.more = (Button) convertView.findViewById(R.id.more);
             convertView.setTag(holder);
         } else {
-            holder = (ViewHolder) convertView.getTag();
+            holder = (CredentialAdapter.ViewHolder) convertView.getTag();
         }
 
-        holder.id.setText(rowItem.getId() + "");
-        holder.message.setText(rowItem.getMessage());
-        holder.extra.setText(rowItem.getExtra());
-        holder.title.setText(rowItem.getTitle());
+//        holder.id.setText(rowItem.getId() + "");
+        holder.token.setText(rowItem.getToken());
 
 
 //        holder.more.setOnClickListener(new View.OnClickListener() {
@@ -82,4 +73,3 @@ public class NotifyAdapter extends ArrayAdapter<Notify> {
         return convertView;
     }
 }
-
