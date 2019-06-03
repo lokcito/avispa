@@ -37,6 +37,7 @@ import java.util.ArrayList;
 
 import info.rayrojas.avispa.activities.CredentialsActivity;
 import info.rayrojas.avispa.adapters.NotifyAdapter;
+import info.rayrojas.avispa.conf.Settings;
 import info.rayrojas.avispa.models.Channel;
 import info.rayrojas.avispa.models.Credential;
 import info.rayrojas.avispa.models.Event;
@@ -53,7 +54,7 @@ public class MainActivity extends AppCompatActivity
     ArrayList<Notify> items;
     NotifyAdapter itemsAdapter;
     SpyService serviceCommunitcation;
-
+    Boolean wasBinded = false;
     Notify list;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,23 +79,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
 
-
-//        Event oo = new Event();
-//        oo.getAll(this);
-//        Credential o = new Credential();
-//        o.getAll(this);
-//        Channel ooo = new Channel();
-//        ooo.getAll(this);
         list = new Notify();
-//        Log.v("bichito", list.getAll(this).size() + "<<items");
-//
-//        Notify currentUser = new Notify();
-//        currentUser.id = 1;
-//        currentUser.title = "sample";
-//        currentUser.message = "sample message";
-//        currentUser.extra = "sample extra";
-//        currentUser.token = "0";
-//        currentUser.setLocal(this);
 
         listViewNotifications = (ListView) findViewById(R.id.listNotifications);
 
@@ -146,13 +131,12 @@ public class MainActivity extends AppCompatActivity
 //            }
 
     public void doStartService() {
-        //SpyService serviceObject = new SpyService(getApplicationContext());
         Intent mServiceIntent = new Intent(this, SpyService.class);
         if (!isMyServiceRunning(SpyService.class)) {
             startService(mServiceIntent);
         }
+        wasBinded = true;
         bindService(mServiceIntent, this, Context.BIND_AUTO_CREATE);
-//        startService(new Intent(this, SpyService.class));
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
@@ -167,7 +151,24 @@ public class MainActivity extends AppCompatActivity
         return false;
     }
 
+    public void restartService() {
+        Snackbar.make(getWindow().getDecorView(), "Parando servicio.", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
+        doStopService();
+        Snackbar.make(getWindow().getDecorView(), "Reiniciando servicio.", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
+        doStartService();
+    }
+
     public void doStopService() {
+//        if (!isMyServiceRunning(SpyService.class)) {
+//            return;
+//        }
+        if (serviceCommunitcation != null && wasBinded) {
+            serviceCommunitcation.setCallBack(null);
+            unbindService(this);
+            wasBinded = false;
+        }
         stopService(new Intent(this, SpyService.class));
     }
 
@@ -198,10 +199,12 @@ public class MainActivity extends AppCompatActivity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
+//        View v = findViewById(R.id.action_restart);
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        } else if ( id == R.id.action_restart ) {
+            restartService();
         }
 
         return super.onOptionsItemSelected(item);
@@ -241,6 +244,32 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    public boolean setupCredentials() {
+        Channel _currentChannel = new Channel();
+        _currentChannel.getActive(this);
+        if ( _currentChannel.isNonDefined() ) {
+            return false;
+        }
+
+        Event _currentEvent = new Event();
+        _currentEvent.getActive(this);
+        if ( _currentEvent.isNonDefined() ) {
+            return false;
+        }
+
+        Credential _currentCredential = new Credential();
+        _currentCredential.getActive(this);
+
+        if (  _currentCredential.isNonDefined()) {
+            return false;
+        }
+
+        Settings.PUSHER_CHANNEL_INFO = _currentChannel.getName();
+        Settings.PUSHER_EVENT_INFO = _currentEvent.getName();
+        Settings.PUSHER_TOKEN = _currentCredential.getToken();
+        return true;
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -249,6 +278,7 @@ public class MainActivity extends AppCompatActivity
         if (serviceCommunitcation != null) {
             serviceCommunitcation.setCallBack(null);
             unbindService(this);
+            wasBinded = false;
         }
 
     }
@@ -270,13 +300,21 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        doStartService();
+        if (setupCredentials()) {
+            restartService();
+        } else {
+            Snackbar.make(getWindow().getDecorView(), "No existe datos definidos.", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+        }
+
+        //doStartService();
     }
 
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
         serviceCommunitcation = ((SpyService.MyBinder)service).getService();
         serviceCommunitcation.setCallBack(this);
+        wasBinded = true;
     }
 
     @Override

@@ -1,16 +1,19 @@
 package info.rayrojas.avispa.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.ArrayAdapter;
 
 import java.util.ArrayList;
 
 import info.rayrojas.avispa.R;
+import info.rayrojas.avispa.activities.CredentialsActivity;
 import info.rayrojas.avispa.models.Credential;
 import info.rayrojas.avispa.models.Notify;
 
@@ -21,6 +24,7 @@ public class CredentialAdapter extends ArrayAdapter<Credential> {
     private class ViewHolder {
         TextView id;
         TextView token;
+        Switch toogle;
 
         private ViewHolder() {
         }
@@ -49,15 +53,34 @@ public class CredentialAdapter extends ArrayAdapter<Credential> {
 
             //holder.id = (TextView) convertView.findViewById(R.id._id);
             holder.token = (TextView) convertView.findViewById(R.id.token);
+            holder.toogle = (Switch) convertView.findViewById(R.id.switch_on_off);
 //            holder.more = (Button) convertView.findViewById(R.id.more);
             convertView.setTag(holder);
         } else {
             holder = (CredentialAdapter.ViewHolder) convertView.getTag();
         }
-
+        if ( rowItem.getIsActive().equals("1") ) {
+            holder.toogle.setChecked(true);
+        } else {
+            holder.toogle.setChecked(false);
+        }
 //        holder.id.setText(rowItem.getId() + "");
         holder.token.setText(rowItem.getToken());
-
+        holder.toogle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Switch o = (Switch) v;
+                if ( o.isChecked() ) {
+                    rowItem.setActiveJustOne(context);
+                } else {
+                    o.setChecked(true);
+                }
+                CredentialsActivity oo = (CredentialsActivity) CredentialAdapter.this.context;
+                if ( oo != null ) {
+                    oo.refreshDatabase();
+                }
+            }
+        });
 
 //        holder.more.setOnClickListener(new View.OnClickListener() {
 //            @Override

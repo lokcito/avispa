@@ -10,13 +10,14 @@ import android.provider.BaseColumns;
 import java.util.ArrayList;
 
 import info.rayrojas.avispa.conf.Settings;
+import info.rayrojas.avispa.helpers.DatabaseHelper;
 
 public class Notify {
     private int id;
     private String title;
     private String message;
     private String token;
-    public static NotifyDbHelper dbInstance;
+    public static DatabaseHelper dbInstance;
     private String extra;
 
     public int getId() {
@@ -60,53 +61,53 @@ public class Notify {
     }
 
 
-    /* LocalStorage */
+//    /* LocalStorage */
+//
+//    public static class NotifyTable implements BaseColumns {
+//        public static final String TABLE_NAME = "avispa_notifications";
+//
+//    }
+//
+//    public class NotifyDbHelper extends SQLiteOpenHelper {
+//
+//        private static final String SQL_CREATE_TABLE =
+//                "CREATE TABLE " + NotifyTable.TABLE_NAME + " (" +
+//                        NotifyTable._ID + " INTEGER PRIMARY KEY," +
+//                        NotifyTable.COLUMN_NAME_TITLE + " TEXT," +
+//                        NotifyTable.COLUMN_NAME_MESSAGE + " TEXT," +
+//                        NotifyTable.COLUMN_NAME_EXTRA + " TEXT," +
+//                        NotifyTable.COLUMN_NAME_TOKEN + " TEXT)";
+//
+//
+//        private static final String SQL_DELETE_ENTRIES =
+//                "DROP TABLE IF EXISTS " + NotifyTable.TABLE_NAME;
+//
+//        public NotifyDbHelper(Context context) {
+//            super(context, Settings.DATABASE_NAME, null, Settings.DATABASE_VERSION);
+//        }
+//
+//        @Override
+//        public void onCreate(SQLiteDatabase db) {
+//            db.execSQL(SQL_CREATE_TABLE);
+//        }
+//
+//        @Override
+//        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+//            db.execSQL(SQL_DELETE_ENTRIES);
+//            onCreate(db);
+//        }
+//
+//        @Override
+//        public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+//            onUpgrade(db, oldVersion, newVersion);
+//        }
+//    }
+//
+//    /* End LocalStorage */
 
-    public static class NotifyTable implements BaseColumns {
-        public static final String TABLE_NAME = "avispa_notifications";
-
-    }
-
-    public class NotifyDbHelper extends SQLiteOpenHelper {
-
-        private static final String SQL_CREATE_TABLE =
-                "CREATE TABLE " + NotifyTable.TABLE_NAME + " (" +
-                        NotifyTable._ID + " INTEGER PRIMARY KEY," +
-                        NotifyTable.COLUMN_NAME_TITLE + " TEXT," +
-                        NotifyTable.COLUMN_NAME_MESSAGE + " TEXT," +
-                        NotifyTable.COLUMN_NAME_EXTRA + " TEXT," +
-                        NotifyTable.COLUMN_NAME_TOKEN + " TEXT)";
-
-
-        private static final String SQL_DELETE_ENTRIES =
-                "DROP TABLE IF EXISTS " + NotifyTable.TABLE_NAME;
-
-        public NotifyDbHelper(Context context) {
-            super(context, Settings.DATABASE_NAME, null, Settings.DATABASE_VERSION);
-        }
-
-        @Override
-        public void onCreate(SQLiteDatabase db) {
-            db.execSQL(SQL_CREATE_TABLE);
-        }
-
-        @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            db.execSQL(SQL_DELETE_ENTRIES);
-            onCreate(db);
-        }
-
-        @Override
-        public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            onUpgrade(db, oldVersion, newVersion);
-        }
-    }
-
-    /* End LocalStorage */
-
-    public NotifyDbHelper getDbInstance(Context _context) {
+    public DatabaseHelper getDbInstance(Context _context) {
         if ( Notify.dbInstance == null ) {
-            Notify.dbInstance = new NotifyDbHelper(_context);
+            Notify.dbInstance = new DatabaseHelper(_context);
             return Notify.dbInstance;
         }
         return Notify.dbInstance;
@@ -115,11 +116,13 @@ public class Notify {
     public void getOne(Context _context) {
         SQLiteDatabase db = this.getDbInstance(_context).getReadableDatabase();
 
-        String[] fields = new String[] {NotifyTable._ID, NotifyTable.COLUMN_NAME_TITLE,
-            NotifyTable.COLUMN_NAME_MESSAGE, NotifyTable.COLUMN_NAME_EXTRA};
+        String[] fields = new String[] {DatabaseHelper.Columns._ID,
+                DatabaseHelper.Columns.COLUMN_NAME_TITLE,
+                DatabaseHelper.Columns.COLUMN_NAME_MESSAGE,
+                DatabaseHelper.Columns.COLUMN_NAME_EXTRA};
         String[] args = new String[] {this.getId() + ""};
 
-        Cursor c = db.query(NotifyTable.TABLE_NAME, fields,
+        Cursor c = db.query(DatabaseHelper.NOTIFY_TABLE_NAME, fields,
                 null, null,  null, null, null);
 
         //Nos aseguramos de que existe al menos un registro
@@ -137,12 +140,15 @@ public class Notify {
         ArrayList<Notify> rows = new ArrayList<>();
         SQLiteDatabase db = this.getDbInstance(_context).getReadableDatabase();
 
-        String[] fields = new String[] {NotifyTable._ID, NotifyTable.COLUMN_NAME_TITLE,
-                NotifyTable.COLUMN_NAME_MESSAGE, NotifyTable.COLUMN_NAME_EXTRA};
+        String[] fields = new String[] {DatabaseHelper.Columns._ID,
+                DatabaseHelper.Columns.COLUMN_NAME_TITLE,
+                DatabaseHelper.Columns.COLUMN_NAME_MESSAGE,
+                DatabaseHelper.Columns.COLUMN_NAME_EXTRA};
         String[] args = new String[] {this.getId() + ""};
 
-        Cursor c = db.query(NotifyTable.TABLE_NAME, fields,
-                null, null,  null, null, NotifyTable._ID+" DESC");
+        Cursor c = db.query(DatabaseHelper.NOTIFY_TABLE_NAME, fields,
+                null, null,  null, null,
+                DatabaseHelper.Columns._ID+" DESC");
 
         //Nos aseguramos de que existe al menos un registro
         if (c.moveToFirst()) {
@@ -161,24 +167,24 @@ public class Notify {
     public void unsetLocal(Context _context) {
         SQLiteDatabase db = this.getDbInstance(_context).getWritableDatabase();
         String[] args = new String[] {this.getId() + ""};
-        db.delete(NotifyTable.TABLE_NAME, "_id = ?", args);
+        db.delete(DatabaseHelper.NOTIFY_TABLE_NAME, "_id = ?", args);
     }
 
     public void setLocal(Context _context) {
         SQLiteDatabase db = this.getDbInstance(_context).getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(NotifyTable.COLUMN_NAME_TITLE, this.getTitle());
-        values.put(NotifyTable.COLUMN_NAME_MESSAGE, this.getMessage());
-        values.put(NotifyTable.COLUMN_NAME_EXTRA, this.getExtra());
-        values.put(NotifyTable.COLUMN_NAME_TOKEN, this.getToken());
+        values.put(DatabaseHelper.Columns.COLUMN_NAME_TITLE, this.getTitle());
+        values.put(DatabaseHelper.Columns.COLUMN_NAME_MESSAGE, this.getMessage());
+        values.put(DatabaseHelper.Columns.COLUMN_NAME_EXTRA, this.getExtra());
+        values.put(DatabaseHelper.Columns.COLUMN_NAME_TOKEN, this.getToken());
 
         String[] args = new String[] {this.getId() + ""};
 
         if (this.id == 0) {
             this.id = this.getAll(_context).size() + 1;
         }
-        long newRowId = db.insert(NotifyTable.TABLE_NAME, null, values);
+        long newRowId = db.insert(DatabaseHelper.NOTIFY_TABLE_NAME, null, values);
     }
 
 

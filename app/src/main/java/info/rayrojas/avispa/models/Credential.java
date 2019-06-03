@@ -10,12 +10,14 @@ import android.provider.BaseColumns;
 import java.util.ArrayList;
 
 import info.rayrojas.avispa.conf.Settings;
+import info.rayrojas.avispa.helpers.DatabaseHelper;
 
 public class Credential {
     public String token;
+    public String is_active;
 
     private int id;
-    public static Credential.CredentialDbHelper dbInstance;
+    public static DatabaseHelper dbInstance;
 
 
     /* LocalStorage */
@@ -36,15 +38,21 @@ public class Credential {
         this.token = name;
     }
 
+    public String getIsActive() {
+        return is_active;
+    }
 
+    public void setIsActive(String is_active) {
+        this.is_active = is_active;
+    }
 
 
     /* End LocalStorage */
 
 
-    public Credential.CredentialDbHelper getDbInstance(Context _context) {
+    public DatabaseHelper getDbInstance(Context _context) {
         if ( Credential.dbInstance == null ) {
-            Credential.dbInstance = new Credential.CredentialDbHelper(_context);
+            Credential.dbInstance = new DatabaseHelper(_context);
             return Credential.dbInstance;
         }
         return Credential.dbInstance;
@@ -53,10 +61,12 @@ public class Credential {
     public void getOne(Context _context) {
         SQLiteDatabase db = this.getDbInstance(_context).getReadableDatabase();
 
-        String[] fields = new String[] {Credential.CredentialTable._ID, CredentialTable.COLUMN_NAME_TOKEN};
+        String[] fields = new String[] {DatabaseHelper.Columns._ID,
+                DatabaseHelper.Columns.COLUMN_NAME_TOKEN,
+                DatabaseHelper.Columns.COLUMN_NAME_ACTIVE};
         String[] args = new String[] {this.getId() + ""};
 
-        Cursor c = db.query(Credential.CredentialTable.TABLE_NAME, fields,
+        Cursor c = db.query(DatabaseHelper.CREDENTIAL_TABLE_NAME, fields,
                 null, null,  null, null, null);
 
         //Nos aseguramos de que existe al menos un registro
@@ -64,6 +74,28 @@ public class Credential {
             do {
                 this.setId(c.getInt(0));
                 this.setToken(c.getString(1));
+                this.setIsActive(c.getString(2));
+            } while(c.moveToNext());
+        }
+    }
+
+    public void getActive(Context _context) {
+        SQLiteDatabase db = this.getDbInstance(_context).getReadableDatabase();
+
+        String[] fields = new String[] {DatabaseHelper.Columns._ID,
+                DatabaseHelper.Columns.COLUMN_NAME_TOKEN,
+                DatabaseHelper.Columns.COLUMN_NAME_ACTIVE};
+        String[] args = new String[] {"1"};
+
+        Cursor c = db.query(DatabaseHelper.CREDENTIAL_TABLE_NAME, fields,
+                "is_active = ?", args, null, null, null);
+
+        //Nos aseguramos de que existe al menos un registro
+        if (c.moveToFirst()) {
+            do {
+                this.setId(c.getInt(0));
+                this.setToken(c.getString(1));
+                this.setIsActive(c.getString(2));
             } while(c.moveToNext());
         }
     }
@@ -72,12 +104,14 @@ public class Credential {
         ArrayList<Credential> rows = new ArrayList<>();
         SQLiteDatabase db = this.getDbInstance(_context).getReadableDatabase();
 
-        String[] fields = new String[] {Credential.CredentialTable._ID, CredentialTable.COLUMN_NAME_TOKEN};
+        String[] fields = new String[] {DatabaseHelper.Columns._ID,
+                DatabaseHelper.Columns.COLUMN_NAME_TOKEN,
+                DatabaseHelper.Columns.COLUMN_NAME_ACTIVE};
         String[] args = new String[] {this.getId() + ""};
 
-        Cursor c = db.query(Credential.CredentialTable.TABLE_NAME, fields,
+        Cursor c = db.query(DatabaseHelper.CREDENTIAL_TABLE_NAME, fields,
                 null, null,  null, null,
-                Credential.CredentialTable._ID+" DESC");
+                DatabaseHelper.Columns._ID+" DESC");
 
         //Nos aseguramos de que existe al menos un registro
         if (c.moveToFirst()) {
@@ -85,6 +119,7 @@ public class Credential {
                 Credential n = new Credential();
                 n.setId(c.getInt(0));
                 n.setToken(c.getString(1));
+                n.setIsActive(c.getString(2));
                 rows.add(n);
             } while(c.moveToNext());
         }
@@ -94,20 +129,49 @@ public class Credential {
     public void unsetLocal(Context _context) {
         SQLiteDatabase db = this.getDbInstance(_context).getWritableDatabase();
         String[] args = new String[] {this.getId() + ""};
-        db.delete(Credential.CredentialTable.TABLE_NAME, "_id = ?", args);
+        db.delete(DatabaseHelper.CREDENTIAL_TABLE_NAME, "_id = ?", args);
+    }
+
+    public  void updateLocal(Context _context) {
+        SQLiteDatabase db = this.getDbInstance(_context).getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(DatabaseHelper.Columns.COLUMN_NAME_TOKEN, this.getToken());
+        values.put(DatabaseHelper.Columns.COLUMN_NAME_ACTIVE, this.getIsActive());
+
+        String[] args = new String[] {this.getId() + ""};
+
+        long newRowId = db.update(DatabaseHelper.CREDENTIAL_TABLE_NAME, values, "_id = ?", args);
+    }
+    public void setActiveJustOne(Context _context) {
+        SQLiteDatabase db = this.getDbInstance(_context).getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(DatabaseHelper.Columns.COLUMN_NAME_ACTIVE, "0");
+        long newRowId = db.update(DatabaseHelper.CREDENTIAL_TABLE_NAME, values, null, null);
+
+        ContentValues values_ = new ContentValues();
+        values_.put(DatabaseHelper.Columns.COLUMN_NAME_ACTIVE, "1");
+
+        String[] args = new String[] {this.getId() + ""};
+
+        long newRowId_ = db.update(DatabaseHelper.CREDENTIAL_TABLE_NAME, values_, "_id = ?", args);
+
+    }
+
+    public boolean isNonDefined() {
+        return this.id == 0;
     }
 
     public void setLocal(Context _context) {
         SQLiteDatabase db = this.getDbInstance(_context).getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(CredentialTable.COLUMN_NAME_TOKEN, this.getToken());
-
-        String[] args = new String[] {this.getId() + ""};
+        values.put(DatabaseHelper.Columns.COLUMN_NAME_TOKEN, this.getToken());
+        values.put(DatabaseHelper.Columns.COLUMN_NAME_ACTIVE, "0");
 
         if (this.id == 0) {
             this.id = this.getAll(_context).size() + 1;
         }
-        long newRowId = db.insert(CredentialTable.TABLE_NAME, null, values);
+        long newRowId = db.insert(DatabaseHelper.CREDENTIAL_TABLE_NAME, null, values);
     }
 }

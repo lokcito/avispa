@@ -27,6 +27,8 @@ import org.json.JSONObject;
 import info.rayrojas.avispa.MainActivity;
 import info.rayrojas.avispa.R;
 import info.rayrojas.avispa.conf.Settings;
+import info.rayrojas.avispa.models.Credential;
+import info.rayrojas.avispa.models.Event;
 import info.rayrojas.avispa.models.Notify;
 import info.rayrojas.avispa.notifiers.NotificationView;
 
@@ -121,9 +123,41 @@ public class SpyService extends Service {
     public IBinder onBind(Intent intent) {
         return mLocalbinder;
     }
+
+    public boolean setupCredentials() {
+        info.rayrojas.avispa.models.Channel _currentChannel = new info.rayrojas.avispa.models.Channel();
+        _currentChannel.getActive(this);
+        if ( _currentChannel.isNonDefined() ) {
+            return false;
+        }
+
+        Event _currentEvent = new Event();
+        _currentEvent.getActive(this);
+        if ( _currentEvent.isNonDefined() ) {
+            return false;
+        }
+
+        Credential _currentCredential = new Credential();
+        _currentCredential.getActive(this);
+
+        if (  _currentCredential.isNonDefined()) {
+            return false;
+        }
+
+        Settings.PUSHER_CHANNEL_INFO = _currentChannel.getName();
+        Settings.PUSHER_EVENT_INFO = _currentEvent.getName();
+        Settings.PUSHER_TOKEN = _currentCredential.getToken();
+        return true;
+    }
+
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
+
+        if (!setupCredentials()) {
+            return START_STICKY;
+        }
+
         PusherOptions options = new PusherOptions();
         options.setCluster("us2");
         Pusher pusher = new Pusher(Settings.PUSHER_TOKEN, options);
@@ -149,17 +183,17 @@ public class SpyService extends Service {
                 try {
                     _title = jsonObject.getString("title");
                 } catch (JSONException e) {
-                    e.printStackTrace();
+//                    e.printStackTrace();
                 }
                 try {
                     _message = jsonObject.getString("message");
                 } catch (JSONException e) {
-                    e.printStackTrace();
+//                    e.printStackTrace();
                 }
                 try {
                     _extra = jsonObject.getString("_extra");
                 } catch (JSONException e) {
-                    e.printStackTrace();
+//                    e.printStackTrace();
                 }
                 final String title = _title;
                 final String message = _message;
@@ -199,6 +233,7 @@ public class SpyService extends Service {
     public void onDestroy() {
         super.onDestroy();
         Log.v("bichito", "aqui sse muere el servicio");
+
 //        Intent broadcastIntent = new Intent("ac.in.ActivityRecognition.RestartSensor");
 //        sendBroadcast(broadcastIntent);
     }

@@ -1,6 +1,7 @@
 package info.rayrojas.avispa.activities;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -14,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
+import info.rayrojas.avispa.MainActivity;
 import info.rayrojas.avispa.R;
 import info.rayrojas.avispa.activities.ui.main.PageViewModel;
 import info.rayrojas.avispa.activities.ui.main.PlaceholderFragment;
@@ -27,6 +29,7 @@ public class CredentialsActivity extends AppCompatActivity {
     PageViewModel pageViewModel;
     ViewPager viewPager;
     SectionsPagerAdapter sectionsPagerAdapter;
+
 
     public Fragment getFragmentById(int position) {
         return sectionsPagerAdapter.getItem(position);
@@ -42,7 +45,9 @@ public class CredentialsActivity extends AppCompatActivity {
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
         FloatingActionButton fab = findViewById(R.id.fab);
+        FloatingActionButton goBack = findViewById(R.id.back);
 
+        /*
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             public void onPageScrollStateChanged(int state) {}
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
@@ -54,13 +59,17 @@ public class CredentialsActivity extends AppCompatActivity {
 
 
                 }
-
                 Log.v("bichito", "changed");
                 // Check if this is the page you want.
             }
-        });
+        });*/
 
-
+        goBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent o = new Intent(CredentialsActivity.this, MainActivity.class);
+                startActivity(o);
+            }});
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -114,20 +123,32 @@ public class CredentialsActivity extends AppCompatActivity {
         return viewPager.getCurrentItem();
     }
 
+    public void refreshDatabase() {
+        int ipage = CredentialsActivity.this.getCurrentPage();
+        PlaceholderFragment fragment = (PlaceholderFragment)SectionsPagerAdapter.currentFragments[ipage];
+        fragment.updateRows();
+    }
+
     public void setOnDatabase(String _text) {
         int ipage = CredentialsActivity.this.getCurrentPage();
         if ( ipage == 0 ) {
             Credential o = new Credential();
             o.setToken(_text);
             o.setLocal(CredentialsActivity.this);
+            PlaceholderFragment fragment = (PlaceholderFragment)SectionsPagerAdapter.currentFragments[ipage];
+            fragment.updateRows();
         } else if ( ipage == 1 ) {
             Event o = new Event();
             o.setName(_text);
             o.setLocal(CredentialsActivity.this);
+            PlaceholderFragment fragment = (PlaceholderFragment)SectionsPagerAdapter.currentFragments[ipage];
+            fragment.updateRows();
         } else if ( ipage == 2 ) {
             Channel o = new Channel();
             o.setName(_text);
             o.setLocal(CredentialsActivity.this);
+            PlaceholderFragment fragment = (PlaceholderFragment)SectionsPagerAdapter.currentFragments[ipage];
+            fragment.updateRows();
         }
     }
 
