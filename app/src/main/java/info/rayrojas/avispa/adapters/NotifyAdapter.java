@@ -25,6 +25,8 @@ public class NotifyAdapter extends ArrayAdapter<Notify> {
         TextView title;
         TextView message;
         TextView extra;
+        TextView event;
+        TextView channel;
         Button more;
 
         private ViewHolder() {
@@ -56,6 +58,8 @@ public class NotifyAdapter extends ArrayAdapter<Notify> {
             holder.title = (TextView) convertView.findViewById(R.id.title);
             holder.message = (TextView) convertView.findViewById(R.id.message);
             holder.extra = (TextView) convertView.findViewById(R.id.extra);
+            holder.event = (TextView) convertView.findViewById(R.id.event);
+            holder.channel = (TextView) convertView.findViewById(R.id.channel);
 //            holder.more = (Button) convertView.findViewById(R.id.more);
             convertView.setTag(holder);
         } else {
@@ -66,6 +70,8 @@ public class NotifyAdapter extends ArrayAdapter<Notify> {
         holder.message.setText(rowItem.getMessage());
         holder.extra.setText(rowItem.getExtra());
         holder.title.setText(rowItem.getTitle());
+        holder.event.setText(rowItem.getEvent());
+        holder.channel.setText(rowItem.getChannel());
 
 
 //        holder.more.setOnClickListener(new View.OnClickListener() {

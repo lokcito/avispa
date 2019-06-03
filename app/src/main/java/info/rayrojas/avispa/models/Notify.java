@@ -19,6 +19,8 @@ public class Notify {
     private String token;
     public static DatabaseHelper dbInstance;
     private String extra;
+    private String event;
+    private String channel;
 
     public int getId() {
         return id;
@@ -143,7 +145,10 @@ public class Notify {
         String[] fields = new String[] {DatabaseHelper.Columns._ID,
                 DatabaseHelper.Columns.COLUMN_NAME_TITLE,
                 DatabaseHelper.Columns.COLUMN_NAME_MESSAGE,
-                DatabaseHelper.Columns.COLUMN_NAME_EXTRA};
+                DatabaseHelper.Columns.COLUMN_NAME_EXTRA,
+                DatabaseHelper.Columns.COLUMN_NAME_TOKEN,
+                DatabaseHelper.Columns.COLUMN_NAME_EVENT,
+                DatabaseHelper.Columns.COLUMN_NAME_CHANNEL};
         String[] args = new String[] {this.getId() + ""};
 
         Cursor c = db.query(DatabaseHelper.NOTIFY_TABLE_NAME, fields,
@@ -158,6 +163,9 @@ public class Notify {
                 n.setTitle(c.getString(1));
                 n.setMessage(c.getString(2));
                 n.setExtra(c.getString(3));
+                n.setToken(c.getString(4));
+                n.setEvent(c.getString(5));
+                n.setChannel(c.getString(6));
                 rows.add(n);
             } while(c.moveToNext());
         }
@@ -178,6 +186,8 @@ public class Notify {
         values.put(DatabaseHelper.Columns.COLUMN_NAME_MESSAGE, this.getMessage());
         values.put(DatabaseHelper.Columns.COLUMN_NAME_EXTRA, this.getExtra());
         values.put(DatabaseHelper.Columns.COLUMN_NAME_TOKEN, this.getToken());
+        values.put(DatabaseHelper.Columns.COLUMN_NAME_EVENT, this.getEvent());
+        values.put(DatabaseHelper.Columns.COLUMN_NAME_CHANNEL, this.getChannel());
 
         String[] args = new String[] {this.getId() + ""};
 
@@ -188,4 +198,19 @@ public class Notify {
     }
 
 
+    public String getEvent() {
+        return event;
+    }
+
+    public void setEvent(String event) {
+        this.event = event;
+    }
+
+    public String getChannel() {
+        return channel;
+    }
+
+    public void setChannel(String channel) {
+        this.channel = channel;
+    }
 }

@@ -17,6 +17,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         public static final String COLUMN_NAME_MESSAGE = "message";
         public static final String COLUMN_NAME_EXTRA = "extra";
         public static final String COLUMN_NAME_ACTIVE = "is_active";
+        public static final String COLUMN_NAME_CHANNEL = "channel";
+        public static final String COLUMN_NAME_EVENT = "event";
     }
 
     public static final String CREDENTIAL_TABLE_NAME = "avispa_credentials";
@@ -53,6 +55,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     Columns.COLUMN_NAME_TITLE + " TEXT," +
                     Columns.COLUMN_NAME_MESSAGE + " TEXT," +
                     Columns.COLUMN_NAME_EXTRA + " TEXT," +
+                    Columns.COLUMN_NAME_EVENT + " TEXT," +
+                    Columns.COLUMN_NAME_CHANNEL + " TEXT," +
                     Columns.COLUMN_NAME_TOKEN + " TEXT)";
 
     private static final String NOTIFY_SQL_DELETE_ENTRIES =

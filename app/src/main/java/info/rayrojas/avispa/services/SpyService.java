@@ -208,7 +208,9 @@ public class SpyService extends Service {
                     currentUser.setTitle(title);
                     currentUser.setMessage(message);
                     currentUser.setExtra(extra);
-                    currentUser.setToken("0");
+                    currentUser.setChannel(channelName);
+                    currentUser.setEvent(eventName);
+                    currentUser.setToken(Settings.PUSHER_TOKEN);
                     currentUser.setLocal(SpyService.this);
                     Notification(title, message);
                     if (mCallBack != null) {
