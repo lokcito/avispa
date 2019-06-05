@@ -17,6 +17,7 @@ public class Credential {
     public String is_active;
 
     private int id;
+    private String client;
     public static DatabaseHelper dbInstance;
 
 
@@ -63,7 +64,8 @@ public class Credential {
 
         String[] fields = new String[] {DatabaseHelper.Columns._ID,
                 DatabaseHelper.Columns.COLUMN_NAME_TOKEN,
-                DatabaseHelper.Columns.COLUMN_NAME_ACTIVE};
+                DatabaseHelper.Columns.COLUMN_NAME_ACTIVE,
+                DatabaseHelper.Columns.COLUMN_NAME_CLIENT};
         String[] args = new String[] {this.getId() + ""};
 
         Cursor c = db.query(DatabaseHelper.CREDENTIAL_TABLE_NAME, fields,
@@ -75,6 +77,7 @@ public class Credential {
                 this.setId(c.getInt(0));
                 this.setToken(c.getString(1));
                 this.setIsActive(c.getString(2));
+                this.setClient(c.getString(3));
             } while(c.moveToNext());
         }
     }
@@ -84,7 +87,8 @@ public class Credential {
 
         String[] fields = new String[] {DatabaseHelper.Columns._ID,
                 DatabaseHelper.Columns.COLUMN_NAME_TOKEN,
-                DatabaseHelper.Columns.COLUMN_NAME_ACTIVE};
+                DatabaseHelper.Columns.COLUMN_NAME_ACTIVE,
+                DatabaseHelper.Columns.COLUMN_NAME_CLIENT};
         String[] args = new String[] {"1"};
 
         Cursor c = db.query(DatabaseHelper.CREDENTIAL_TABLE_NAME, fields,
@@ -96,6 +100,7 @@ public class Credential {
                 this.setId(c.getInt(0));
                 this.setToken(c.getString(1));
                 this.setIsActive(c.getString(2));
+                this.setClient(c.getString(3));
             } while(c.moveToNext());
         }
     }
@@ -106,7 +111,8 @@ public class Credential {
 
         String[] fields = new String[] {DatabaseHelper.Columns._ID,
                 DatabaseHelper.Columns.COLUMN_NAME_TOKEN,
-                DatabaseHelper.Columns.COLUMN_NAME_ACTIVE};
+                DatabaseHelper.Columns.COLUMN_NAME_ACTIVE,
+                DatabaseHelper.Columns.COLUMN_NAME_CLIENT};
         String[] args = new String[] {this.getId() + ""};
 
         Cursor c = db.query(DatabaseHelper.CREDENTIAL_TABLE_NAME, fields,
@@ -120,6 +126,7 @@ public class Credential {
                 n.setId(c.getInt(0));
                 n.setToken(c.getString(1));
                 n.setIsActive(c.getString(2));
+                n.setClient(c.getString(3));
                 rows.add(n);
             } while(c.moveToNext());
         }
@@ -138,6 +145,7 @@ public class Credential {
         ContentValues values = new ContentValues();
         values.put(DatabaseHelper.Columns.COLUMN_NAME_TOKEN, this.getToken());
         values.put(DatabaseHelper.Columns.COLUMN_NAME_ACTIVE, this.getIsActive());
+        values.put(DatabaseHelper.Columns.COLUMN_NAME_CLIENT, this.getIsActive());
 
         String[] args = new String[] {this.getId() + ""};
 
@@ -168,10 +176,19 @@ public class Credential {
         ContentValues values = new ContentValues();
         values.put(DatabaseHelper.Columns.COLUMN_NAME_TOKEN, this.getToken());
         values.put(DatabaseHelper.Columns.COLUMN_NAME_ACTIVE, "0");
+        values.put(DatabaseHelper.Columns.COLUMN_NAME_CLIENT, this.getClient());
 
         if (this.id == 0) {
             this.id = this.getAll(_context).size() + 1;
         }
         long newRowId = db.insert(DatabaseHelper.CREDENTIAL_TABLE_NAME, null, values);
+    }
+
+    public String getClient() {
+        return client;
+    }
+
+    public void setClient(String client) {
+        this.client = client;
     }
 }

@@ -19,12 +19,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         public static final String COLUMN_NAME_ACTIVE = "is_active";
         public static final String COLUMN_NAME_CHANNEL = "channel";
         public static final String COLUMN_NAME_EVENT = "event";
+        public static final String COLUMN_NAME_CLIENT = "client";
     }
 
     public static final String CREDENTIAL_TABLE_NAME = "avispa_credentials";
     private static final String CREDENTIAL_SQL_CREATE_TABLE =
             "CREATE TABLE " + CREDENTIAL_TABLE_NAME + " (" +
                     Columns._ID + " INTEGER PRIMARY KEY," +
+                    Columns.COLUMN_NAME_CLIENT + " TEXT, " +
                     Columns.COLUMN_NAME_TOKEN + " TEXT, " +
                     Columns.COLUMN_NAME_ACTIVE + " TEXT)";
     private static final String CREDENTIAL_SQL_DELETE_ENTRIES =

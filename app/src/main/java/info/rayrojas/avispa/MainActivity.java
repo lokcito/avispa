@@ -264,9 +264,10 @@ public class MainActivity extends AppCompatActivity
             return false;
         }
 
-        Settings.PUSHER_CHANNEL_INFO = _currentChannel.getName();
-        Settings.PUSHER_EVENT_INFO = _currentEvent.getName();
-        Settings.PUSHER_TOKEN = _currentCredential.getToken();
+        Settings.CLIENT_CHANNEL_INFO = _currentChannel.getName();
+        Settings.CLIENT_EVENT_INFO = _currentEvent.getName();
+        Settings.CLIENT_TOKEN = _currentCredential.getToken();
+        Settings.CLIENT_PROVIDER = _currentCredential.getClient();
         return true;
     }
 

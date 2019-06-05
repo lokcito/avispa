@@ -16,10 +16,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.pusher.client.Pusher;
-import com.pusher.client.PusherOptions;
-import com.pusher.client.channel.Channel;
-import com.pusher.client.channel.SubscriptionEventListener;
+
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -59,6 +56,12 @@ public class SpyService extends Service {
         super();
         context = applicationContext;
         Log.v("bichito", "aqui sse crea el servicio");
+    }
+
+    public void triggerCallback() {
+        if (mCallBack != null) {
+            mCallBack.onOperationCompleted();
+        }
     }
 
     public void Notification(String title, String message) {
@@ -144,9 +147,10 @@ public class SpyService extends Service {
             return false;
         }
 
-        Settings.PUSHER_CHANNEL_INFO = _currentChannel.getName();
-        Settings.PUSHER_EVENT_INFO = _currentEvent.getName();
-        Settings.PUSHER_TOKEN = _currentCredential.getToken();
+        Settings.CLIENT_CHANNEL_INFO = _currentChannel.getName();
+        Settings.CLIENT_EVENT_INFO = _currentEvent.getName();
+        Settings.CLIENT_TOKEN = _currentCredential.getToken();
+        Settings.CLIENT_PROVIDER = _currentCredential.getClient();
         return true;
     }
 
@@ -157,76 +161,15 @@ public class SpyService extends Service {
         if (!setupCredentials()) {
             return START_STICKY;
         }
+        if ( Settings.CLIENT_PROVIDER.equals("pusher") ) {
+            PusherService o = new PusherService(this);
+            o.listen();
+        } else if (Settings.CLIENT_PROVIDER.equals("ably") ) {
+            AblyService o = new AblyService(this);
+            o.listen();
+        }
+//        PusherService o = new PusherService(this);
 
-        PusherOptions options = new PusherOptions();
-        options.setCluster("us2");
-        Pusher pusher = new Pusher(Settings.PUSHER_TOKEN, options);
-
-        Channel channel = pusher.subscribe(Settings.PUSHER_CHANNEL_INFO);
-
-        channel.bind(Settings.PUSHER_EVENT_INFO, new SubscriptionEventListener() {
-            @Override
-            public void onEvent(final String channelName, final String eventName, final String data) {
-                JSONObject jsonObject = null;
-                try {
-                    jsonObject = new JSONObject(data);
-                }catch (JSONException err){
-                    Log.d("Error", err.toString());
-                    return;
-                }
-                if ( jsonObject == null ) {
-                    return;
-                }
-                String _title = "Pusher Notification";
-                String _message = data;
-                String _extra = "-";
-                try {
-                    _title = jsonObject.getString("title");
-                } catch (JSONException e) {
-//                    e.printStackTrace();
-                }
-                try {
-                    _message = jsonObject.getString("message");
-                } catch (JSONException e) {
-//                    e.printStackTrace();
-                }
-                try {
-                    _extra = jsonObject.getString("_extra");
-                } catch (JSONException e) {
-//                    e.printStackTrace();
-                }
-                final String title = _title;
-                final String message = _message;
-                final String extra = _extra;
-                //editText.setText(data);
-//                showForegroundNotification(data);
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
-                    Notify currentUser = new Notify();
-                    currentUser.setId(0);
-                    currentUser.setTitle(title);
-                    currentUser.setMessage(message);
-                    currentUser.setExtra(extra);
-                    currentUser.setChannel(channelName);
-                    currentUser.setEvent(eventName);
-                    currentUser.setToken(Settings.PUSHER_TOKEN);
-                    currentUser.setLocal(SpyService.this);
-                    Notification(title, message);
-                    if (mCallBack != null) {
-                        mCallBack.onOperationCompleted();
-                    }
-
-//                        showForegroundNotification("xxxxg");
-//                        Toast.makeText(SpyService.this, data, Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-//                Toast.makeText(MainActivity.this, data, Toast.LENGTH_LONG).show();
-            }
-        });
-
-        pusher.connect();
         //we have some options for service
         //start sticky means service will be explicity started and stopped
         return START_STICKY;
@@ -238,5 +181,60 @@ public class SpyService extends Service {
 
 //        Intent broadcastIntent = new Intent("ac.in.ActivityRecognition.RestartSensor");
 //        sendBroadcast(broadcastIntent);
+    }
+    public void pullData(String client, final String channel, final String event, String data) {
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(data);
+        }catch (JSONException err){
+            Log.d("Error", err.toString());
+            return;
+        }
+        if ( jsonObject == null ) {
+            return;
+        }
+        String _title = client;
+        String _message = data;
+        String _extra = "-";
+        try {
+            _title = jsonObject.getString("title");
+        } catch (JSONException e) {
+//                    e.printStackTrace();
+        }
+        try {
+            _message = jsonObject.getString("message");
+        } catch (JSONException e) {
+//                    e.printStackTrace();
+        }
+        try {
+            _extra = jsonObject.getString("_extra");
+        } catch (JSONException e) {
+//                    e.printStackTrace();
+        }
+        final String title = _title;
+        final String message = _message;
+        final String extra = _extra;
+        //editText.setText(data);
+//                showForegroundNotification(data);
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                Notify currentUser = new Notify();
+                currentUser.setId(0);
+                currentUser.setTitle(title);
+                currentUser.setMessage(message);
+                currentUser.setExtra(extra);
+                currentUser.setChannel(channel);
+                currentUser.setEvent(event);
+                currentUser.setToken(Settings.CLIENT_TOKEN);
+                currentUser.setLocal(SpyService.this);
+                SpyService.this.Notification(title, message);
+                SpyService.this.triggerCallback();
+
+//                        showForegroundNotification("xxxxg");
+//                        Toast.makeText(SpyService.this, data, Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 }

@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Switch;
 
 import info.rayrojas.avispa.MainActivity;
 import info.rayrojas.avispa.R;
@@ -75,10 +76,17 @@ public class CredentialsActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-
+                final int ipage = CredentialsActivity.this.getCurrentPage();
                 // get prompts.xml view
                 LayoutInflater li = LayoutInflater.from(CredentialsActivity.this);
-                View promptsView = li.inflate(R.layout.credential_input_dialog, null);
+                final View promptsView;
+                if ( ipage == 0 ) {
+                    promptsView = li.inflate(R.layout.credential_input_dialog, null);
+                } else {
+                    promptsView = li.inflate(R.layout.event_input_dialog, null);
+                }
+
+
 
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                         CredentialsActivity.this);
@@ -86,6 +94,28 @@ public class CredentialsActivity extends AppCompatActivity {
                 // set prompts.xml to alertdialog builder
                 alertDialogBuilder.setView(promptsView);
 
+
+                if ( ipage == 0 ) {
+                    final Switch switchPusher = (Switch) promptsView
+                            .findViewById(R.id.switchPusher);
+
+                    final Switch switchAbly = (Switch) promptsView
+                            .findViewById(R.id.switchAbly);
+
+                    switchPusher.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            switchAbly.setChecked(false);
+                        }
+                    });
+
+                    switchAbly.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            switchPusher.setChecked(false);
+                        }
+                    });
+                }
                 final EditText userInput = (EditText) promptsView
                         .findViewById(R.id.editTextDialogUserInput);
 
@@ -97,8 +127,15 @@ public class CredentialsActivity extends AppCompatActivity {
                                     public void onClick(DialogInterface dialog, int id) {
                                         // get user input and set it to result
                                         // edit text
-                                        setOnDatabase(userInput.getText().toString());
-                                        //result.setText(userInput.getText());
+
+                                        if ( ipage == 0 ) {
+                                            Switch switchPusher = (Switch) promptsView
+                                                    .findViewById(R.id.switchPusher);
+                                        String client = switchPusher.isChecked() ? "pusher" : "ably";
+                                            setOnDatabase(client, userInput.getText().toString());
+                                        } else {
+                                            setOnDatabase("", userInput.getText().toString());
+                                        }
                                     }
                                 })
                         .setNegativeButton("Cancel",
@@ -129,10 +166,11 @@ public class CredentialsActivity extends AppCompatActivity {
         fragment.updateRows();
     }
 
-    public void setOnDatabase(String _text) {
+    public void setOnDatabase(String client, String _text) {
         int ipage = CredentialsActivity.this.getCurrentPage();
         if ( ipage == 0 ) {
             Credential o = new Credential();
+            o.setClient(client);
             o.setToken(_text);
             o.setLocal(CredentialsActivity.this);
             PlaceholderFragment fragment = (PlaceholderFragment)SectionsPagerAdapter.currentFragments[ipage];
