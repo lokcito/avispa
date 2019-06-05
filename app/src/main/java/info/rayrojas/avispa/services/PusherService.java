@@ -18,14 +18,18 @@ import info.rayrojas.avispa.models.Notify;
 
 public class PusherService {
     SpyService spy;
+    Pusher pusher;
     public PusherService(SpyService _spy) {
         spy = _spy;
+    }
+    public void close() {
+        pusher.disconnect();
     }
 
     public void listen() {
         PusherOptions options = new PusherOptions();
         options.setCluster("us2");
-        Pusher pusher = new Pusher(Settings.CLIENT_TOKEN, options);
+        pusher = new Pusher(Settings.CLIENT_TOKEN, options);
 
         Channel channel = pusher.subscribe(Settings.CLIENT_CHANNEL_INFO);
 

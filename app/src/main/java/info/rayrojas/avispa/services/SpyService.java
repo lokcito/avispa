@@ -37,6 +37,8 @@ public class SpyService extends Service {
     Context context;
     private CallBack mCallBack;
     private MyBinder mLocalbinder = new MyBinder();
+    AblyService ablyService;
+    PusherService pusherService;
     public SpyService() {
 
     }
@@ -162,12 +164,19 @@ public class SpyService extends Service {
             return START_STICKY;
         }
         if ( Settings.CLIENT_PROVIDER.equals("pusher") ) {
-            PusherService o = new PusherService(this);
-            o.listen();
+            pusherService = new PusherService(this);
+            pusherService.listen();
         } else if (Settings.CLIENT_PROVIDER.equals("ably") ) {
-            AblyService o = new AblyService(this);
-            o.listen();
+            ablyService = new AblyService(this);
+            ablyService.listen();
         }
+        new android.os.Handler().postDelayed(
+                new Runnable() {
+                    public void run() {
+                        Log.v("bichito", "This'll run 300 milliseconds later" + this);
+                    }
+                },
+                2000);
 //        PusherService o = new PusherService(this);
 
         //we have some options for service
@@ -177,6 +186,12 @@ public class SpyService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        if ( ablyService != null ) {
+            ablyService.close();
+        }
+        if ( pusherService != null ) {
+            pusherService.close();
+        }
         Log.v("bichito", "aqui sse muere el servicio");
 
 //        Intent broadcastIntent = new Intent("ac.in.ActivityRecognition.RestartSensor");

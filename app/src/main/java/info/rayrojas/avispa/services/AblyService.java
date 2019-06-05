@@ -2,6 +2,9 @@ package info.rayrojas.avispa.services;
 
 import android.util.Log;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import info.rayrojas.avispa.conf.Settings;
 import io.ably.lib.realtime.AblyRealtime;
 import io.ably.lib.realtime.Channel;
@@ -13,12 +16,16 @@ import static io.ably.lib.realtime.ConnectionEvent.connected;
 
 public class AblyService {
     SpyService spy;
+    AblyRealtime ably;
     public AblyService(SpyService _spy) {
         this.spy = _spy;
     }
+    public void close (){
+        ably.close();
+    }
     public void listen() {
         try {
-            AblyRealtime ably = new AblyRealtime(Settings.CLIENT_TOKEN);
+            ably = new AblyRealtime(Settings.CLIENT_TOKEN);
             ably.connection.on(new ConnectionStateListener() {
                 @Override
                 public void onConnectionStateChanged(ConnectionStateListener.ConnectionStateChange state) {
@@ -39,9 +46,31 @@ public class AblyService {
             channel.subscribe(events, new Channel.MessageListener() {
                 @Override
                 public void onMessage(Message message) {
+                    Log.v("bichito", "Received message with data" + message.id + "--->" + message.clientId + "<<");
+                    JSONObject jsonObject = null;
+                    try {
+                        jsonObject = new JSONObject(message.data.toString());
+                    }catch (JSONException err){
+                        Log.d("Error", err.toString());
+                        return;
+                    }
+                    String event = "any";
+
+                    if ( jsonObject != null ) {
+                        try {
+                            JSONObject extra = jsonObject.getJSONObject("extra");
+                            if ( extra != null ) {
+                                event = extra.getString("event");
+                            }
+                        } catch (JSONException e) {
+
+                        }
+                    }
+//
+
                     AblyService.this.spy.pullData("Ably", Settings.CLIENT_CHANNEL_INFO,
-                            "any", message.data.toString());
-//                    Log.v("bichito", "Received `" +messages.data + "` message with data");
+                            event, message.data.toString());
+
                 }
             });
 

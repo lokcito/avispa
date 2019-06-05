@@ -69,6 +69,7 @@ public class CredentialsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent o = new Intent(CredentialsActivity.this, MainActivity.class);
+                o.putExtra("action", "refresh");
                 startActivity(o);
             }});
         fab.setOnClickListener(new View.OnClickListener() {

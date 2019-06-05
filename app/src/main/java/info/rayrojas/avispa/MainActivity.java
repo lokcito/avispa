@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity
     SpyService serviceCommunitcation;
     Boolean wasBinded = false;
     Notify list;
+    Boolean myFirstTime = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,7 +67,8 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                updateRows();
+                Snackbar.make(view, "Refrescando", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
@@ -135,6 +137,11 @@ public class MainActivity extends AppCompatActivity
         if (!isMyServiceRunning(SpyService.class)) {
             startService(mServiceIntent);
         }
+        wasBinded = true;
+        bindService(mServiceIntent, this, Context.BIND_AUTO_CREATE);
+    }
+    public void reBind() {
+        Intent mServiceIntent = new Intent(this, SpyService.class);
         wasBinded = true;
         bindService(mServiceIntent, this, Context.BIND_AUTO_CREATE);
     }
@@ -303,6 +310,18 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
         if (setupCredentials()) {
             restartService();
+//            if ( myFirstTime ) {
+//                myFirstTime = false;
+//                restartService();
+//            } else {
+//                Intent intent = getIntent();
+//                String action = intent.getStringExtra("action");
+//                if ( action != null && action == "refresh" ) {
+//                    restartService();
+//                } else {
+//                    reBind();
+//                }
+//            }
         } else {
             Snackbar.make(getWindow().getDecorView(), "No existe datos definidos.", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
