@@ -115,13 +115,16 @@ public class Notify {
         return Notify.dbInstance;
     }
 
-    public void getOne(Context _context) {
+    public Notify getOne(Context _context) {
         SQLiteDatabase db = this.getDbInstance(_context).getReadableDatabase();
 
         String[] fields = new String[] {DatabaseHelper.Columns._ID,
                 DatabaseHelper.Columns.COLUMN_NAME_TITLE,
                 DatabaseHelper.Columns.COLUMN_NAME_MESSAGE,
-                DatabaseHelper.Columns.COLUMN_NAME_EXTRA};
+                DatabaseHelper.Columns.COLUMN_NAME_EXTRA,
+                DatabaseHelper.Columns.COLUMN_NAME_CHANNEL,
+                DatabaseHelper.Columns.COLUMN_NAME_EVENT,
+                DatabaseHelper.Columns.COLUMN_NAME_TOKEN};
         String[] args = new String[] {this.getId() + ""};
 
         Cursor c = db.query(DatabaseHelper.NOTIFY_TABLE_NAME, fields,
@@ -134,8 +137,13 @@ public class Notify {
                 this.setTitle(c.getString(1));
                 this.setMessage(c.getString(2));
                 this.setExtra(c.getString(3));
+                this.setChannel(c.getString(4));
+                this.setEvent(c.getString(5));
+                this.setToken(c.getString(6));
             } while(c.moveToNext());
+            return this;
         }
+        return null;
     }
 
     public ArrayList<Notify> getAll(Context _context) {

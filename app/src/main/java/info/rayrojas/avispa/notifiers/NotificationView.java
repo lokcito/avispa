@@ -6,16 +6,26 @@ import android.content.Intent;
 import android.app.NotificationManager;
 
 
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
+import info.rayrojas.avispa.MainActivity;
 import info.rayrojas.avispa.R;
+import info.rayrojas.avispa.models.Notify;
 
 public class NotificationView extends Activity {
-    String title;
-    String text;
-    TextView txttitle;
-    TextView txttext;
+    int notifyId;
+    TextView _title;
+    TextView _client;
+    TextView _event;
+    TextView _channel;
 
+    TextView _message;
+    TextView _extra;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,16 +38,46 @@ public class NotificationView extends Activity {
 
         // Retrive the data from MainActivity.java
         Intent i = getIntent();
+        try {
+            i.getIntExtra("notifyId", notifyId);
+        } catch (Exception ex){
 
-        title = i.getStringExtra("title");
-        text = i.getStringExtra("text");
+        }
+        Notify o = new Notify();
+        o.setId(notifyId);
+        Notify oo = o.getOne(this);
+        if ( oo == null ) {
+            return;
+        }
+        draw(oo);
 
-        // Locate the TextView
-        txttitle = (TextView) findViewById(R.id.title);
-        txttext = (TextView) findViewById(R.id.text);
+    }
+    public void draw(Notify currentNotify) {
+        _title = (TextView) findViewById(R.id.txtTitle);
+        _client = (TextView) findViewById(R.id.txtClient);
+        _event = (TextView) findViewById(R.id.txtEvent);
+        _channel = (TextView) findViewById(R.id.txtChannel);
+        _message = (TextView) findViewById(R.id.message);
+        _extra = (TextView) findViewById(R.id.extra);
 
-        // Set the data into TextView
-        txttitle.setText(title);
-        txttext.setText(text);
+        _title.setText(String.format("Titulo: %s", currentNotify.getTitle()));
+        _client.setText(String.format("Cliente: %s", currentNotify.getToken()));
+        _channel.setText(String.format("Canal: %s", currentNotify.getChannel()));
+        _event.setText(String.format("Evento: %s", currentNotify.getEvent()));
+
+        _message.setText(String.format(currentNotify.getMessage()));
+        _message.setEnabled(false);
+        _extra.setText(String.format(currentNotify.getExtra()));
+        _extra.setEnabled(false);
+        Button btnList = (Button)findViewById(R.id.btnList);
+        btnList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent o = new Intent(NotificationView.this, MainActivity.class);
+                startActivity(o);
+
+            }
+        });
+
     }
 }

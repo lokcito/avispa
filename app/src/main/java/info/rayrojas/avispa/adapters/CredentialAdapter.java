@@ -23,7 +23,6 @@ public class CredentialAdapter extends ArrayAdapter<Credential> {
 
     private class ViewHolder {
         TextView id;
-        TextView token;
         Switch toogle;
 
         private ViewHolder() {
@@ -52,7 +51,6 @@ public class CredentialAdapter extends ArrayAdapter<Credential> {
             holder = new CredentialAdapter.ViewHolder();
 
             //holder.id = (TextView) convertView.findViewById(R.id._id);
-            holder.token = (TextView) convertView.findViewById(R.id.token);
             holder.toogle = (Switch) convertView.findViewById(R.id.switch_on_off);
 //            holder.more = (Button) convertView.findViewById(R.id.more);
             convertView.setTag(holder);
@@ -65,7 +63,7 @@ public class CredentialAdapter extends ArrayAdapter<Credential> {
             holder.toogle.setChecked(false);
         }
 //        holder.id.setText(rowItem.getId() + "");
-        holder.token.setText(rowItem.getToken());
+        holder.toogle.setText(rowItem.getToken());
         holder.toogle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

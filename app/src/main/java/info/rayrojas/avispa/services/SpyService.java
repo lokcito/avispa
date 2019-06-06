@@ -66,17 +66,13 @@ public class SpyService extends Service {
         }
     }
 
-    public void Notification(String title, String message) {
-        // Set Notification Title
-        String strtitle = "sss";
-        // Set Notification Text
-        String strtext = "sds";
+    public void Notification(int notifyId, String title, String message) {
+
 
         // Open NotificationView Class on Notification Click
         Intent intent = new Intent(this, NotificationView.class);
         // Send data to NotificationView Class
-        intent.putExtra("title", strtitle);
-        intent.putExtra("text", strtext);
+        intent.putExtra("notifyId", notifyId);
         // Open NotificationView.java Activity
         PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
@@ -170,13 +166,6 @@ public class SpyService extends Service {
             ablyService = new AblyService(this);
             ablyService.listen();
         }
-        new android.os.Handler().postDelayed(
-                new Runnable() {
-                    public void run() {
-                        Log.v("bichito", "This'll run 300 milliseconds later" + this);
-                    }
-                },
-                2000);
 //        PusherService o = new PusherService(this);
 
         //we have some options for service
@@ -243,7 +232,7 @@ public class SpyService extends Service {
                 currentUser.setEvent(event);
                 currentUser.setToken(Settings.CLIENT_TOKEN);
                 currentUser.setLocal(SpyService.this);
-                SpyService.this.Notification(title, message);
+                SpyService.this.Notification(currentUser.getId(), title, message);
                 SpyService.this.triggerCallback();
 
 //                        showForegroundNotification("xxxxg");

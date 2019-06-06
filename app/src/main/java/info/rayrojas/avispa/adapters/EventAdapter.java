@@ -23,7 +23,6 @@ public class EventAdapter extends ArrayAdapter<Event> {
 
     private class ViewHolder {
         TextView id;
-        TextView name;
         Switch toogle;
 
 
@@ -52,7 +51,6 @@ public class EventAdapter extends ArrayAdapter<Event> {
             convertView = mInflater.inflate(R.layout.adapter_event_item, null);
             holder = new EventAdapter.ViewHolder();
 
-            holder.name = (TextView) convertView.findViewById(R.id.name);
             holder.toogle = (Switch) convertView.findViewById(R.id.switch_on_off);
             convertView.setTag(holder);
         } else {
@@ -65,7 +63,7 @@ public class EventAdapter extends ArrayAdapter<Event> {
             holder.toogle.setChecked(false);
         }
 
-        holder.name.setText(rowItem.getName());
+        holder.toogle.setText(rowItem.getName());
 
         holder.toogle.setOnClickListener(new View.OnClickListener() {
             @Override

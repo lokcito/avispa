@@ -39,6 +39,13 @@ public class NotifyAdapter extends ArrayAdapter<Notify> {
             o.unsetLocal(this.context);
         }
     }
+    public Notify getOneByPosition(int position) {
+        Notify o = this.items.get(position);
+        if ( o != null ) {
+            return o;
+        }
+        return null;
+    }
 
     public NotifyAdapter(Context context, ArrayList<Notify> _items) {
         super(context, 0, _items);

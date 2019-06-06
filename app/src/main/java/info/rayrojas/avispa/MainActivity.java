@@ -42,6 +42,7 @@ import info.rayrojas.avispa.models.Channel;
 import info.rayrojas.avispa.models.Credential;
 import info.rayrojas.avispa.models.Event;
 import info.rayrojas.avispa.models.Notify;
+import info.rayrojas.avispa.notifiers.NotificationView;
 import info.rayrojas.avispa.services.SpyService;
 
 
@@ -116,7 +117,14 @@ public class MainActivity extends AppCompatActivity
                 if (touchListener.existPendingDismisses()) {
                     touchListener.undoPendingDismiss();
                 } else {
-                    Toast.makeText(MainActivity.this, "Position " + position, Toast.LENGTH_SHORT).show();
+                    Intent currentIntent = new Intent(MainActivity.this, NotificationView.class);
+                    Notify currentNotify = itemsAdapter.getOneByPosition(position);
+                    if ( currentNotify == null ) {
+                        Toast.makeText(MainActivity.this, "Error en la selección.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    currentIntent.putExtra("notifyId", currentNotify.getId());
+                    startActivity(currentIntent);
                 }
             }
         });
@@ -154,7 +162,6 @@ public class MainActivity extends AppCompatActivity
                 return true;
             }
         }
-        Log.v("bichito", false+">>");
         return false;
     }
 
@@ -308,13 +315,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
+        Log.v("bichito", "on resume");
         if (setupCredentials()) {
             restartService();
 //            if ( myFirstTime ) {
 //                myFirstTime = false;
 //                restartService();
 //            } else {
-//                Intent intent = getIntent();
+//                Intent intent = getIntent();ok
 //                String action = intent.getStringExtra("action");
 //                if ( action != null && action == "refresh" ) {
 //                    restartService();

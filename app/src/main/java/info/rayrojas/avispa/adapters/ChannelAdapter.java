@@ -23,7 +23,6 @@ public class ChannelAdapter extends ArrayAdapter<Channel> {
 
     private class ViewHolder {
         TextView id;
-        TextView name;
         Switch toogle;
 
         private ViewHolder() {
@@ -51,7 +50,6 @@ public class ChannelAdapter extends ArrayAdapter<Channel> {
             convertView = mInflater.inflate(R.layout.adapter_channel_item, null);
             holder = new ChannelAdapter.ViewHolder();
 
-            holder.name = (TextView) convertView.findViewById(R.id.name);
             holder.toogle = (Switch) convertView.findViewById(R.id.switch_on_off);
 //            holder.more = (Button) convertView.findViewById(R.id.more);
             convertView.setTag(holder);
@@ -65,7 +63,7 @@ public class ChannelAdapter extends ArrayAdapter<Channel> {
             holder.toogle.setChecked(false);
         }
 
-        holder.name.setText(rowItem.getName());
+        holder.toogle.setText(rowItem.getName());
         holder.toogle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
