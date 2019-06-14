@@ -22,5 +22,6 @@
   * Install Android Studio 3.4.1
   * Clone the repository
 ## Cast Screens
-  * >
+  * [![Screncast 1](https://rayrojas-cache.s3-us-west-2.amazonaws.com/github/media/first.png)]( https://rayrojas-cache.s3-us-west-2.amazonaws.com/github/media/first-screencast-opt.mp4)
+  * [![Screncast 1](https://rayrojas-cache.s3-us-west-2.amazonaws.com/github/media/second.png)]( https://rayrojas-cache.s3-us-west-2.amazonaws.com/github/media/second-screencast-opt.mp4)  
 ## Last Release
