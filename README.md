@@ -1,4 +1,10 @@
 # Avispa - Client Android for RealTime Data
+## Capabilities
+  - Channels, allows setting up multiple channels
+  - Events, allows setting up multiple events
+  - Tokens, allows setting up multiple tokens by service (Pusher, Ably)
+  - Listen just one channel and event at same time.
+  - Runs in background.
 ## Support
   * Android:
     - compileSdkVersion: 28

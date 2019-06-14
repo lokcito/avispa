@@ -230,19 +230,9 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_home) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-            updateRows();
-        } else if (id == R.id.nav_slideshow) {
+        if (id == R.id.nav_setup) {
             Intent o = new Intent(this, CredentialsActivity.class);
             startActivity(o);
-        } else if (id == R.id.nav_tools) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -253,7 +243,6 @@ public class MainActivity extends AppCompatActivity
     public void updateRows() {
         items.clear();
         items.addAll(list.getAll(this));
-        Toast.makeText(this, "n rows: " + items.size(), Toast.LENGTH_SHORT).show();
         itemsAdapter.notifyDataSetChanged();
 
     }

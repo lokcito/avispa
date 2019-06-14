@@ -235,17 +235,17 @@ public class PlaceholderFragment extends Fragment {
         if ( this.POSITION == 1 ) {
             credentialItems.clear();
             credentialItems.addAll(credentialList.getAll(_context));
-            Toast.makeText(_context, "n rows: " + credentialItems.size(), Toast.LENGTH_SHORT).show();
+//            Toast.makeText(_context, "n rows: " + credentialItems.size(), Toast.LENGTH_SHORT).show();
             credentialAdapter.notifyDataSetChanged();
         } else if ( this.POSITION == 2 ) {
             eventItems.clear();
             eventItems.addAll(eventList.getAll(_context));
-            Toast.makeText(_context, "n rows: " + eventItems.size(), Toast.LENGTH_SHORT).show();
+//            Toast.makeText(_context, "n rows: " + eventItems.size(), Toast.LENGTH_SHORT).show();
             eventAdapter.notifyDataSetChanged();
         } else if ( this.POSITION == 3 ) {
             channelItems.clear();
             channelItems.addAll(channelList.getAll(_context));
-            Toast.makeText(_context, "n rows: " + channelItems.size(), Toast.LENGTH_SHORT).show();
+//            Toast.makeText(_context, "n rows: " + channelItems.size(), Toast.LENGTH_SHORT).show();
             channelAdapter.notifyDataSetChanged();
         }
 

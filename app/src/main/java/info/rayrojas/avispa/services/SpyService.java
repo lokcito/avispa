@@ -80,7 +80,7 @@ public class SpyService extends Service {
         //Create Notification using NotificationCompat.Builder
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 // Set Icon
-                .setSmallIcon(R.drawable.ic_hongus)
+                .setSmallIcon(R.mipmap.ic_launcher_foreground_avispa)
                 // Set Ticker Message
                 .setTicker(getString(R.string.avispa_notify))
                 // Set Title

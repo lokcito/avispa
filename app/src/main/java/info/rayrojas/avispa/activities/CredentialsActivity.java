@@ -92,7 +92,6 @@ public class CredentialsActivity extends AppCompatActivity {
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                         CredentialsActivity.this);
 
-                // set prompts.xml to alertdialog builder
                 alertDialogBuilder.setView(promptsView);
 
 
