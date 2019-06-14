@@ -1,3 +1,20 @@
-
-2019-05-29 10:25:45.925 12016-12016/info.rayrojas.avispa D/PLAGA>: Bichitos FCM Token: fCND-5L3zB0:APA91bFZn_EevfIXwPAjZhAIpuBUWMcF26VrAGII4_6eZLJOeq3sMAG7Y1c5hX1DlpXWFLHwAzrUQz8XYILn86kiLWWNc_MLJyoFj2iEHJk6vrzvY2Bz5cxx2Kdkyhv6BZqvvoNtBp6x
-
+# Avispa - Client Android for RealTime Data
+## Support
+  * Android:
+    - compileSdkVersion: 28
+    - minSdkVersion: 22
+    - targetSdkVersion: 28  
+    * Tested in devices:
+      - 3.2  HVGA slider (ADP1) API 22
+        - Lollipop
+          * API Level 22 
+          * Target Android 5.1
+  * Data from services:
+    * Pusher
+    * Ably
+## How to implement?
+  * Install Android Studio 3.4.1
+  * Clone the repository
+## Cast Screens
+  * >
+## Last Release
