@@ -34,10 +34,14 @@ import com.hudomju.swipe.adapter.ListViewAdapter;
 
 
 import java.util.ArrayList;
+import java.util.Observable;
 
 import info.rayrojas.avispa.activities.CredentialsActivity;
 import info.rayrojas.avispa.adapters.NotifyAdapter;
 import info.rayrojas.avispa.conf.Settings;
+import info.rayrojas.avispa.helpers.Callback;
+import info.rayrojas.avispa.helpers.ObjectBind;
+import info.rayrojas.avispa.helpers.ObjectMonitor;
 import info.rayrojas.avispa.models.Channel;
 import info.rayrojas.avispa.models.Credential;
 import info.rayrojas.avispa.models.Event;
@@ -58,6 +62,9 @@ public class MainActivity extends AppCompatActivity
     Boolean wasBinded = false;
     Notify list;
     Boolean myFirstTime = true;
+    ObjectMonitor objectMonitor;
+    ObjectBind objectBind;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -128,6 +135,19 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         });
+
+        objectBind = new ObjectBind();
+        objectBind.setCallback(new Callback(){
+            @Override
+            public void doThis(Observable o, Object c) {
+                Log.v("bichito", "End upadte");
+            }
+        });
+
+        Channel channelObject = new Channel();
+        channelObject.setName("xD");
+        objectMonitor = new ObjectMonitor(channelObject);
+        objectMonitor.addObserver(objectBind);
 
     }
 
@@ -215,9 +235,8 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 //        View v = findViewById(R.id.action_restart);
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        } else if ( id == R.id.action_restart ) {
+
+        if ( id == R.id.action_restart ) {
             restartService();
         }
 
@@ -277,6 +296,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         super.onPause();
+        Channel xx = new Channel();
+        xx.setName("iii");
+        objectMonitor.setWachedValue(xx);
         Log.v("bichito", "gonna pause");
 // unbindService if activity is in onPause() state
         if (serviceCommunitcation != null) {
